@@ -1,6 +1,5 @@
 import Menu from "./Menu";
 import Header from "./components/Header/Header";
-import menu from "./Data";
 import "./App.css";
 
 function App() {
@@ -11,7 +10,7 @@ function App() {
       <main>
         <h2>Our Menu</h2>
 
-        <Menu dishes={menu} />
+        <Menu />
       </main>
     </div>
   );
