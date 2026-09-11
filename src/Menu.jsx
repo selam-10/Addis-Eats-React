@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import CategoryBar from "./CategoryBar";
 import DishList from "./DishList";
 import DeliveryForm from "./DeliveryForm";
 import { loadDishes } from "./api";
 
-function Menu() {
-  const [category, setCategory] = useState("Main");
+function Menu({ order, onAdd }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const categoryFromUrl = searchParams.get("category") || "Main";
+
+  const [category, setCategory] = useState(categoryFromUrl);
   const [dishes, setDishes] = useState([]);
-  const [order, setOrder] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -15,6 +19,10 @@ function Menu() {
   const searchRef = useRef(null);
 
   const categories = ["Main", "Side", "Drink", "Dessert"];
+
+  useEffect(() => {
+    setCategory(categoryFromUrl);
+  }, [categoryFromUrl]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -34,7 +42,9 @@ function Menu() {
           setError(err.message);
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
@@ -45,28 +55,27 @@ function Menu() {
     };
   }, [category]);
 
-  // Automatically focus the search input when Menu loads
   useEffect(() => {
     searchRef.current?.focus();
   }, []);
 
-  const handleAdd = (dish) => {
-    setOrder([...order, dish]);
+  const handleCategoryChange = (newCategory) => {
+    setSearchParams({ category: newCategory });
   };
 
-  const total = order.reduce((sum, dish) => sum + dish.price, 0);
+  const total = order.reduce(
+    (sum, dish) => sum + dish.price,
+    0
+  );
 
-  // Filter dishes based on search text
   const searchedDishes = dishes.filter((dish) =>
     dish.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Loading state
   if (loading) {
     return <p>Loading dishes...</p>;
   }
 
-  // Error state
   if (error) {
     return <p className="error">Error: {error}</p>;
   }
@@ -76,7 +85,7 @@ function Menu() {
       <CategoryBar
         categories={categories}
         selectedCategory={category}
-        onCategoryChange={setCategory}
+        onCategoryChange={handleCategoryChange}
       />
 
       <div className="search-container">
@@ -92,7 +101,7 @@ function Menu() {
 
       <DishList
         dishes={searchedDishes}
-        onAdd={handleAdd}
+        onAdd={onAdd}
       />
 
       <div className="order-total">
