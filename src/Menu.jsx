@@ -3,12 +3,14 @@ import { useSearchParams } from "react-router-dom";
 import CategoryBar from "./CategoryBar";
 import DishList from "./DishList";
 import DeliveryForm from "./DeliveryForm";
+import useCartStore from "./store/cartStore";
 import { loadDishes } from "./api";
 
-function Menu({ order, onAdd }) {
+function Menu() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const categoryFromUrl = searchParams.get("category") || "Main";
+  const categoryFromUrl =
+    searchParams.get("category") || "Main";
 
   const [category, setCategory] = useState(categoryFromUrl);
   const [dishes, setDishes] = useState([]);
@@ -18,7 +20,14 @@ function Menu({ order, onAdd }) {
 
   const searchRef = useRef(null);
 
-  const categories = ["Main", "Side", "Drink", "Dessert"];
+  const items = useCartStore((state) => state.items);
+
+  const categories = [
+    "Main",
+    "Side",
+    "Drink",
+    "Dessert",
+  ];
 
   useEffect(() => {
     setCategory(categoryFromUrl);
@@ -35,7 +44,9 @@ function Menu({ order, onAdd }) {
         const data = await loadDishes(controller.signal);
 
         setDishes(
-          data.filter((dish) => dish.category === category)
+          data.filter(
+            (dish) => dish.category === category
+          )
         );
       } catch (err) {
         if (err.name !== "AbortError") {
@@ -63,13 +74,15 @@ function Menu({ order, onAdd }) {
     setSearchParams({ category: newCategory });
   };
 
-  const total = order.reduce(
+  const total = items.reduce(
     (sum, dish) => sum + dish.price,
     0
   );
 
   const searchedDishes = dishes.filter((dish) =>
-    dish.name.toLowerCase().includes(search.toLowerCase())
+    dish.name
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
   if (loading) {
@@ -99,10 +112,7 @@ function Menu({ order, onAdd }) {
         />
       </div>
 
-      <DishList
-        dishes={searchedDishes}
-        onAdd={onAdd}
-      />
+      <DishList dishes={searchedDishes} />
 
       <div className="order-total">
         <h2>Order Total: {total} ETB</h2>

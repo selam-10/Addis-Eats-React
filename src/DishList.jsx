@@ -1,20 +1,21 @@
-import { Link } from "react-router-dom";
 import Dish from "./Dish";
-import Card from "./Card";
 
-function DishList({ dishes, onAdd }) {
-  if (dishes.length === 0) {
+function DishList({ dishes }) {
+  if (!dishes || dishes.length === 0) {
     return <p>No dishes found.</p>;
   }
 
   return (
-    <div className="menu">
+    <div className="dish-list">
       {dishes.map((dish) => (
-        <Card key={dish.id}>
-          <Link to={`/menu/${dish.id}`}>
-            <Dish {...dish} onAdd={() => onAdd(dish)} />
-          </Link>
-        </Card>
+        <Dish
+          key={dish.id}
+          id={dish.id}
+          name={dish.name}
+          price={dish.price}
+          spicy={dish.spicy}
+          currency={dish.currency}
+        />
       ))}
     </div>
   );

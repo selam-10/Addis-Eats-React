@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout/Layout";
@@ -29,53 +28,22 @@ function NotFound() {
 }
 
 function App() {
-  const [order, setOrder] = useState([]);
-
-  const handleAdd = (dish) => {
-    setOrder([...order, dish]);
-  };
-
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        
-        {/* Home page */}
         <Route index element={<Home />} />
 
-        {/* Menu page */}
-        <Route
-          path="menu"
-          element={
-            <Menu
-              order={order}
-              onAdd={handleAdd}
-            />
-          }
-        />
+        <Route path="menu" element={<Menu />} />
 
-        {/* Individual dish page */}
-        <Route
-          path="menu/:id"
-          element={<DishDetails />}
-        />
+        <Route path="menu/:id" element={<DishDetails />} />
 
-        {/* Sign in page */}
-        <Route
-          path="signin"
-          element={<SignIn />}
-        />
+        <Route path="signin" element={<SignIn />} />
 
-        {/* Protected checkout page */}
         <Route element={<RequireAuth />}>
-          <Route
-            path="checkout"
-            element={<Checkout order={order} />}
-          />
+          <Route path="checkout" element={<Checkout />} />
         </Route>
 
-        {/* 404 page */}
         <Route path="*" element={<NotFound />} />
-
       </Route>
     </Routes>
   );
