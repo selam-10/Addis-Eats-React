@@ -1,4 +1,6 @@
+
 import useCartStore from "./store/cartStore";
+import DeliveryForm from "./DeliveryForm";
 
 function Checkout() {
   const items = useCartStore((state) => state.items);
@@ -35,6 +37,10 @@ function Checkout() {
           <button onClick={clear}>
             Clear Cart
           </button>
+
+          <hr />
+
+          <DeliveryForm total={total} />
         </>
       )}
     </div>
